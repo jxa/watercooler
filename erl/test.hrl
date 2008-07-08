@@ -1,0 +1,3 @@
+-record(message, {id, room, type, author, body}).
+-record(room, {name, created_on, subject}).
+-record(sequence, {seq, next_id}).
