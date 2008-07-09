@@ -35,6 +35,10 @@ log_message(Room, Type, Author, Body) ->
 messages() ->
     find_all(message).
 
+%% messages(Limit) ->
+%%     find(qld:q([Msg || Msg <- mnesia:table(message),
+%%                       ])).
+
 create(Row) ->
     Fun = fun()->
                   mnesia:write(Row)
