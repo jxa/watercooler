@@ -36,8 +36,24 @@ messages() ->
     find_all(message).
 
 %% messages(Limit) ->
-%%     find(qld:q([Msg || Msg <- mnesia:table(message),
-%%                       ])).
+%%     MatchHead = #message{type='$1',_='_'},
+%%     Guard = {'=:=','$1',msg},
+%%     Result = '$_',
+%%     F = fun() ->
+%%                 {Msgs, _Cont} = mnesia:select(message, [{MatchHead, [Guard], [Result]}], Limit, read),
+%%                 Msgs
+%%         end,
+%%     {atomic, Messages} = mnesia:transaction(F),
+%%     Messages.
+
+messages(Limit) ->
+    MaxID = current_id(message),
+    if
+        MaxID < Limit -> StartID = 0;
+        true          -> StartID = MaxID - Limit
+    end,
+    find(qlc:q([Msg || Msg <- mnesia:table(message),
+                      Msg#message.id >= StartID])).
 
 create(Row) ->
     Fun = fun()->
@@ -55,10 +71,16 @@ find(Q) ->
 find_all(Table) ->
     find(qlc:q([R || R <- mnesia:table(Table)])).
 
+%% actually returns the value of the next id
+%% most recently used id is current_id -1
+current_id(Table) ->
+    [{_,_,ID}] = find(qlc:q([X || X <- mnesia:table(sequence), X#sequence.seq =:= Table])),
+    ID.
+
 next_id(Table) ->
     F = fun() ->
                 %% Get next id in the sequence
-                [{_,_,N}] = find(qlc:q([X || X <- mnesia:table(sequence), X#sequence.seq =:= Table])),
+                N = current_id(Table),
                 %% increment the sequence
                 mnesia:write({sequence, Table, N+1}),
                 N
