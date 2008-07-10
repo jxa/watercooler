@@ -53,7 +53,7 @@ messages(Room, Limit) ->
     QH = qlc:q([Msg || Msg <- mnesia:table(message), Msg#message.room =:= Room]),
     F = fun() ->
                 %% use a cursor to grab only Limit records
-                QC = qlc:cursor(QH),
+                QC = qlc:cursor(qlc:sort(QH, {order, descending})),
                 M = qlc:next_answers(QC, Limit),
                 qlc:delete_cursor(QC),
                 M
