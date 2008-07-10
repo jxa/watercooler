@@ -69,7 +69,7 @@ create(Row) ->
 
 find(Q) ->
     F = fun() ->
-                 qlc:e(Q) end,
+                 qlc:e(qlc:sort(Q)) end,
     {atomic, Val} = mnesia:transaction(F),
     Val.
 
