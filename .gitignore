@@ -1,0 +1,4 @@
+*.beam
+*.mnesia
+*.notes
+Mnesia.*
