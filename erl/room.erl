@@ -24,6 +24,9 @@ create(Name, Subject) ->
 all() ->
     base:find_all(room).
 
+all_names() ->
+    [R#room.name || R <- all()].
+
 % create tests only if eunit is present and enabled
 -ifdef(EUNIT).
 
