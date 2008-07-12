@@ -61,6 +61,12 @@ messages(Room, Limit) ->
     {atomic, Msgs} = mnesia:transaction(F),
     Msgs.
 
+messages_more_recent_than_id(Room,ID) ->
+    QH = qlc:q([Msg || Msg <- mnesia:table(message),
+                       Msg#message.room =:= Room,
+                       Msg#message.id > ID]),
+    find(QH).
+
 create(Row) ->
     Fun = fun()->
                   mnesia:write(Row)
