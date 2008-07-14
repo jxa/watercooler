@@ -1,5 +1,54 @@
-<html>
-<body>
-<h1>welcome<h1>
-</body>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <script src="/javascript/jquery.js" type="text/javascript"></script>
+    <style type="text/css">
+dl {
+  position: relative;
+  width: 450px;
+}
+dt {
+  clear: both;
+  float:left;
+  width: 130px;
+  padding: 0 0 0 0;
+  margin: 0 0 1px 0;
+  text-align: left;
+  font-weight: bold;
+}
+dd {
+  float: left;
+  margin: 0 0 1px 0;
+  padding-left: 15px;
+}
+</style>
+
+    <title>Watercooler Chat</title>
+<script>
+  var newest_message=0;
+  function new_messages(){
+    url = "messages/braintree"
+    if(newest_message!=0){ url = url+"?newer_than="+newest_message; };
+    $.getJSON(url,
+        function(data){
+          $.each(data, function(i,item){
+            $("<dt/>").text(item.author).appendTo("#messages");
+            $("<dd/>").text(item.body).appendTo("#messages");
+            newest_message = item.id;
+          });
+        });
+  }
+  $(document).ready(function(){message_refresh();});
+  function message_refresh(){
+    new_messages();
+    setTimeout("message_refresh()",5000);
+  }
+  </script>
+  </head>
+  <body>
+    <h1>Welcome</h1>
+    <div id="content">
+      <dl id="messages"></dl>
+    </div>
+  </body>
 </html>
