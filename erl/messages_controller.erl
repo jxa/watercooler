@@ -1,12 +1,13 @@
 -module(messages_controller).
 -include("/usr/local/lib/yaws/include/yaws_api.hrl").
--export([out/1]).
+-export([out/1, handle_request/3]).
 
 layout(Content) ->
     {ehtml, [{html, [], 
              {body, [], Content}}]}.
 
 out(A) ->
+    io:format("~p~n", [A]),
     Req = A#arg.req,
     Method = Req#http_request.method,
     Path = string:tokens(A#arg.appmoddata, "/"),

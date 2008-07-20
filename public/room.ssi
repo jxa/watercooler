@@ -2,32 +2,12 @@
   <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
     <script src="/javascript/jquery.js" type="text/javascript"></script>
-    <style type="text/css">
-dl {
-  position: relative;
-  width: 450px;
-}
-dt {
-  clear: both;
-  float:left;
-  width: 130px;
-  padding: 0 0 0 0;
-  margin: 0 0 1px 0;
-  text-align: left;
-  font-weight: bold;
-}
-dd {
-  float: left;
-  margin: 0 0 1px 0;
-  padding-left: 15px;
-}
-</style>
-
-    <title>Watercooler Chat</title>
-<script>
+    <link href="screen.css" type="text/css" rel="stylesheet">
+    <title>Watercooler Chat - %room%</title>
+    <script>
   var newest_message=0;
   function new_messages(){
-    url = "/api/messages/braintree"
+    url = "/api/messages/%room%"
     if(newest_message!=0){ url = url+"?newer_than="+newest_message; };
     $.getJSON(url,
         function(data){
@@ -46,7 +26,7 @@ dd {
   </script>
   </head>
   <body>
-    <h1>Welcome</h1>
+    <h1>%room%: %topic%</h1>
     <div id="content">
       <dl id="messages"></dl>
     </div>

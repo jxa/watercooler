@@ -24,6 +24,9 @@ create(Name, Subject) ->
 all() ->
     base:find_all(room).
 
+named(Name) ->
+    base:find(qlc:q([{R#room.name, R#room.subject} || R <- mnesia:table(room), R#room.name =:= Name])).
+
 all_names() ->
     [R#room.name || R <- all()].
 

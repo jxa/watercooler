@@ -10,7 +10,8 @@ init() ->
     mnesia:start(),
     sequence:init(),
     message:init(),
-    room:init().
+    room:init(),
+    load().
 
 load() ->
     message:load(),
