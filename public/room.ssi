@@ -4,31 +4,70 @@
     <script src="/javascript/jquery.js" type="text/javascript"></script>
     <link href="screen.css" type="text/css" rel="stylesheet">
     <title>Watercooler Chat - %room%</title>
-    <script>
+    <script type="text/javascript">
   var newest_message=0;
+  var intervalID;
+
+  function add_messages(data){
+    $.each(data, function(i,item){
+      $("<dt/>").text(item.author).appendTo("#messages");
+      $("<dd/>").text(item.body).appendTo("#messages");
+      newest_message = item.id;
+    });
+  }
+
   function new_messages(){
     url = "/api/messages/%room%"
     if(newest_message!=0){ url = url+"?newer_than="+newest_message; };
     $.getJSON(url,
         function(data){
-          $.each(data, function(i,item){
-            $("<dt/>").text(item.author).appendTo("#messages");
-            $("<dd/>").text(item.body).appendTo("#messages");
-            newest_message = item.id;
-          });
+          add_messages(data);
         });
   }
-  $(document).ready(function(){message_refresh();});
-  function message_refresh(){
+  
+  function get_messages_now(){
+    clearInterval(intervalID);
     new_messages();
-    setTimeout("message_refresh()",5000);
+    intervalID = setInterval(new_messages, 5000);
   }
+
+  $(document).ready(function(){
+    new_messages(); 
+    intervalID = setInterval(new_messages, 5000);
+    $("message_body").keypress(function(event){alert(event);});
+  });
   </script>
+
+<!-- onKeyPress: function(event) { -->
+<!--   this.chat.dispatch('preparationForKeyPress', event); -->
+<!--   switch (event.keyCode) { -->
+<!--     case Event.KEY_RETURN: -->
+<!--     case 3: /* safari sends ASCII 3 for the enter key */ -->
+<!--       if (event.shiftKey) { -->
+<!--         return; -->
+<!--       } else if (event.ctrlKey || event.metaKey) { -->
+<!--         this.send(true); -->
+<!--       } else { -->
+<!--         this.send(); -->
+<!--       } -->
+<!--       Event.stop(event); -->
+<!--     } -->
+<!--   }, -->
+
+
   </head>
   <body>
     <h1>%room%: %topic%</h1>
     <div id="content">
       <dl id="messages"></dl>
+    </div>
+    <div id="form_div">
+      <form id="new_message" onsubmit="$.post('/api/messages/%room%', $('form').serialize(), function(data){get_messages_now();}); return false;">
+        <textarea id="message_body" rows="10" cols="70" name="body"></textarea>
+        <input type="hidden" name="type" value="msg"/>
+        <input type="hidden" name="author" value="xandrews"/>
+        <input type="submit" name="submit" value="Send Message"/>
+      </form>
     </div>
   </body>
 </html>
