@@ -2,3 +2,6 @@
 *.mnesia
 *.notes
 Mnesia.*
+log/*.access
+log/*.log
+yaws.conf
