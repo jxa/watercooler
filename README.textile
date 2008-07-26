@@ -1,0 +1,4 @@
+h1. Watercooler Chat
+
+This is a chat room type application which exists mainly to 
+hone my erlang skillz. But also it is going to be freaky awesome.
