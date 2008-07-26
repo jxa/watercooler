@@ -1,23 +1,10 @@
 -module(messages_controller).
 -include("/usr/local/lib/yaws/include/yaws_api.hrl").
--export([out/1, handle_request/3]).
-
-layout(Content) ->
-    {ehtml, [{html, [], 
-             {body, [], Content}}]}.
-
-out(A) ->
-    io:format("~p~n", [A]),
-    Req = A#arg.req,
-    Method = Req#http_request.method,
-    Path = string:tokens(A#arg.appmoddata, "/"),
-    io:format("~p - ~p~n",[Method, Req#http_request.path]),
-    handle_request(Method, Path, A).
+-export([handle_request/3]).
 
 handle_request('GET', [], _) ->
-    MsgList = message:all(),
-    H2 = "All Rooms",
-    format_list(H2, MsgList);
+    MsgList = message:all(limit, 30),
+    messages_json(MsgList);
 
 handle_request('GET', [Room|_], Arg) ->
     case yaws_api:queryvar(Arg, "newer_than") of
@@ -28,9 +15,7 @@ handle_request('GET', [Room|_], Arg) ->
             end;
         _ -> MsgList = message:all(Room, limit, 30)
     end,
-%    H2 = "In Room: " ++ Room,
     messages_json(MsgList);
-%    format_list(H2, MsgList);
 
 handle_request('POST', [Room|_], Arg) ->
     {ok, Auth} = yaws_api:postvar(Arg, "author"),
@@ -43,15 +28,6 @@ handle_request('POST', [Room|_], Arg) ->
 handle_request(_, _, _Arg) -> % catchall
     [{status, 501}].
 
-format_list(H2, MsgList) ->
-    layout([{h1, [], "Messages"},
-            {h2, [], H2},
-            {ul, [], messages_list(MsgList)}]).
-
 messages_json(List) ->
-%    MJ = [ {struct, [{"author",A}, {"type",T}, {"body",B}] }  || {_, _, _, T, A, B, _Timestamp} <- List],
     MJ = [ {struct, [{"author",A}, {"body",B}, {"id", ID}] }  || {_, ID, _Room, _Type, A, B, _Timestamp} <- List],
     {html, json:encode({array, MJ})}.
-
-messages_list(List) ->
-    [{li, [], Auth ++ ": " ++ Msg} || {_, _, _, _, Auth, Msg, _} <- List].

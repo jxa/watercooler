@@ -32,16 +32,14 @@ create(Room, Type, Author, Body) ->
 all() ->
     base:find_all(message).
 
+all(limit, Limit) ->
+    QH = qlc:q([Msg || Msg <- mnesia:table(message)]),
+    Msgs = base:limit(QH, Limit),
+    lists:sort(Msgs).
+
 all(Room, limit, Limit) ->
     QH = qlc:q([Msg || Msg <- mnesia:table(message), Msg#message.room =:= Room]),
-    F = fun() ->
-                %% use a cursor to grab only Limit records
-                QC = qlc:cursor(qlc:sort(QH, {order, descending})),
-                M = qlc:next_answers(QC, Limit),
-                qlc:delete_cursor(QC),
-                M
-        end,
-    {atomic, Msgs} = mnesia:transaction(F),
+    Msgs = base:limit(QH, Limit),
     lists:sort(Msgs);
 
 all(Room, newer_than, ID) ->
