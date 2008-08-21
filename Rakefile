@@ -15,3 +15,10 @@ end
 
 task :compile => ['ebin'] + OBJ
 task :default => :compile
+task :test => :compile do |t|
+  # tests = list of test files
+#  erl = <<-ERL
+#    code:add_pathz("./ebin/").
+#    try
+#ERL
+end

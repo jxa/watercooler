@@ -7,13 +7,22 @@ layout(Content) ->
              {body, [], Content}}]}.
 
 out(A) ->
-    Path = string:tokens(A#arg.appmoddata, "/"),
-    [Room] = Path,
+    case A#arg.appmoddata of
+        undefined -> Path = "/";
+        _         -> [Path] = string:tokens(A#arg.appmoddata, "/")
+    end,
+    handle_request(Path).
+
+handle_request("/") ->
+    layout([{li, [], room_link(Name)} || Name <- room:all_names()]);
+
+handle_request(Room) ->
     case room:named(Room) of
         [{Name, Topic}] -> 
             [{ssi, "room.ssi", "%", [{"room", Name}, {"topic", Topic}] }];
         _ -> [{status, 404}]
     end.
 
-rooms_list() ->
-    [{li, [], Name} || Name <- room:all_names()].
+room_link(Room) ->
+    Link = "/rooms/" ++ Room,
+    {a, [{href, Link}], Room}.

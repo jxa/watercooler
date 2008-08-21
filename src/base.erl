@@ -11,16 +11,19 @@ init() ->
     sequence:init(),
     message:init(),
     room:init(),
+    wc_user:init(),
     load().
 
 load() ->
     message:load(),
     room:load(),
+    wc_user:load(),
     ok.
 
 reset() ->
     message:reset(),
     room:reset(),
+    wc_user:reset(),
     sequence:reset().
 
 create(Row) ->
@@ -30,10 +33,11 @@ create(Row) ->
     mnesia:transaction(Fun).
 
 find(Q) ->
-    F = fun() ->
-                 qlc:e(qlc:sort(Q)) end,
-    {atomic, Val} = mnesia:transaction(F),
-    Val.
+    F = fun() -> qlc:e(qlc:sort(Q)) end,
+    case mnesia:transaction(F) of
+        {atomic, Val} -> Val;
+        _ -> none
+    end.
 
 find_all(Table) ->
     find(qlc:q([R || R <- mnesia:table(Table)])).
