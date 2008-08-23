@@ -11,15 +11,21 @@ out(A) ->
         undefined -> Path = "/";
         _         -> [Path] = string:tokens(A#arg.appmoddata, "/")
     end,
-    handle_request(Path).
+    case api_controller:get_cookie(A) of
+        none -> [{status, 401}];
+        {OP, _} -> 
+            {Username, _} = OP,
+            handle_request(Path, Username);
+        _ -> [{status, 401}]
+    end.
 
-handle_request("/") ->
+handle_request("/", _Username) ->
     layout([{li, [], room_link(Name)} || Name <- room:all_names()]);
 
-handle_request(Room) ->
+handle_request(Room, Username) ->
     case room:named(Room) of
         [{Name, Topic}] -> 
-            [{ssi, "room.ssi", "%", [{"room", Name}, {"topic", Topic}] }];
+            [{ssi, "room.ssi", "%", [{"room", Name}, {"topic", Topic}, {"username", Username}] }];
         _ -> [{status, 404}]
     end.
 

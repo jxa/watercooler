@@ -1,6 +1,6 @@
 -module(api_controller).
 -include("/usr/local/lib/yaws/include/yaws_api.hrl").
--export([out/1]).
+-export([out/1, get_cookie/1]).
 
 out(A) ->
 %%    io:format("~p~n", [A]),

@@ -63,7 +63,7 @@
         <form id="new_message" onsubmit="$.post('/api/messages/%room%', $('form').serialize(), function(data){get_messages_now();}); return false;">
           <textarea id="message_box" rows="2" cols="50" name="body"></textarea>
           <input type="hidden" name="type" value="msg"/>
-          <input type="hidden" name="author" value="xandrews"/>
+          <input type="hidden" name="author" value="%username%"/>
           <input type="submit" name="submit" value="Send Message"/>
         </form>
       </div>
