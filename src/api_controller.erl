@@ -1,17 +1,24 @@
 -module(api_controller).
 -include("/usr/local/lib/yaws/include/yaws_api.hrl").
--export([out/1, get_cookie/1, current_user/1]).
+-compile(export_all).
 
 out(A) ->
-%%    io:format("~p~n", [A]),
     Req = A#arg.req,
     Method = Req#http_request.method,
     Path = string:tokens(A#arg.appmoddata, "/"),
-    io:format("Cookie: ~p~n",[get_cookie(A)]),
-    case Path of
-        ["rooms"|_] -> rooms_controller:out(A);
-        ["messages"|Tail] -> messages_controller:handle_request(Method, Tail, A);
-        _ -> [{status, 404}]
+    F = fun(_) ->
+                case Path of
+                    ["rooms"|_] -> rooms_controller:out(A);
+                    ["messages"|Tail] -> messages_controller:handle_request(Method, Tail, A);
+                    _ -> [{status, 404}]
+                end
+        end,
+    if_authorized(A, F).
+
+if_authorized(A, Fun) ->
+    case current_user(A) of
+        none -> render_401();
+        Username -> Fun(Username)
     end.
 
 get_cookie(A) ->
@@ -36,3 +43,6 @@ current_user(A) ->
             end;
         _ -> none
      end.
+
+render_401() ->
+    [{status, 401}, {html, "Status 401: Not Authorized"}].
