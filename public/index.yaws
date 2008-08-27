@@ -1,0 +1,29 @@
+<erl>
+out(Arg) ->
+  case api_controller:current_user(Arg) of
+    none -> login();
+    _    -> {redirect_local, "/rooms"}
+  end.
+
+login() ->
+  {ehtml,
+    {html, [], [
+      {head, [], [
+        {link, [{href, "stylesheet/screen.css"}, {type, "text/css"}, {rel, "stylesheet"}], []},
+        {title, [], "Watercooler Chat"}
+      ]},
+      {body, [], [
+        {h1, [], "Watercooler"},
+        {'div', [{id, "content"}], [
+          {h3, [], "Please sign in"},
+          {form, [{method, "POST"}, {id, "login_form"}, {action, "/users/login"}], [
+            {label, [{for, "username"}], "Username"},
+            {input, [{type, "text"}, {name, "username"}], []},
+            {label, [{for, "password"}], "Password"},
+            {input, [{type, "password"}, {name, "password"}], []},
+            {input, [{type, "submit"}, {name, "Login"}, {value, "Login"}], []}
+          ]}
+        ]}
+      ]}
+    ]}}.
+</erl>

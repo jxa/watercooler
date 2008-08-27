@@ -1,6 +1,6 @@
 -module(api_controller).
 -include("/usr/local/lib/yaws/include/yaws_api.hrl").
--export([out/1, get_cookie/1]).
+-export([out/1, get_cookie/1, current_user/1]).
 
 out(A) ->
 %%    io:format("~p~n", [A]),
@@ -20,6 +20,19 @@ get_cookie(A) ->
     case yaws_api:find_cookie_val("watercooler-cred", C) of
         [] -> none;
         Cookie ->
-            {ok, OP} = yaws_api:cookieval_to_opaque(Cookie),
-            {OP, Cookie}
+            case yaws_api:cookieval_to_opaque(Cookie) of
+                {ok, OP} -> {OP, Cookie};
+                _ -> none
+            end
     end.
+
+current_user(A) ->
+    case get_cookie(A) of
+        none -> none;
+        {{Username, Password}, _} ->
+            case wc_user:login(Username, Password) of
+                ok -> Username;
+                _  -> none
+            end;
+        _ -> none
+     end.

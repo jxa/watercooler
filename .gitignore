@@ -5,3 +5,4 @@ Mnesia.*
 log/*.access
 log/*.log
 yaws.conf
+erl_crash.dump
